@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0f1923">
+<title>CRM · Midea Carrier</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1923;--sf:#162030;--sf2:#1e2e42;--ac:#00c896;--ac2:#0098ff;--wn:#ff6b35;--tx:#e8f0f8;--t2:#7a94b0;--bd:#243548;--r:14px;--fh:'Syne',sans-serif;--fb:'DM Sans',sans-serif;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-size:15px;min-height:100vh;padding-bottom:60px}
+.hdr{background:linear-gradient(135deg,#0d2137,#0f1923);border-bottom:1px solid var(--bd);padding:16px 18px 12px;position:sticky;top:0;z-index:100}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px}
+.logo{font-family:var(--fh);font-size:10px;font-weight:700;letter-spacing:3px;color:var(--ac);text-transform:uppercase}
+.db{font-size:11px;color:var(--t2);background:var(--sf2);padding:3px 10px;border-radius:20px;border:1px solid var(--bd)}
+.hdr h1{font-family:var(--fh);font-size:19px;font-weight:800;letter-spacing:-.5px}
+.hdr h1 span{color:var(--ac)}
+.nav{display:flex;gap:6px;padding:9px 14px;background:var(--sf);border-bottom:1px solid var(--bd);overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nb{flex-shrink:0;padding:7px 14px;border-radius:30px;border:1px solid var(--bd);background:transparent;color:var(--t2);font-family:var(--fb);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap}
+.nb.active{background:var(--ac);border-color:var(--ac);color:#0f1923;font-weight:600}
+.nb.gear{margin-left:auto;padding:7px 11px}
+.sc{display:none;padding:14px}.sc.active{display:block}
+.fs{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:14px;margin-bottom:10px}
+.sl{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--ac);margin-bottom:11px}
+.fi{margin-bottom:11px}.fi:last-child{margin-bottom:0}
+.fi label{display:block;font-size:12px;font-weight:500;color:var(--t2);margin-bottom:4px}
+.fi input,.fi select,.fi textarea{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:10px;color:var(--tx);font-family:var(--fb);font-size:15px;padding:10px 12px;outline:none;transition:border-color .2s;-webkit-appearance:none}
+.fi input:focus,.fi select:focus,.fi textarea:focus{border-color:var(--ac);background:#1a2e42}
+.fi textarea{resize:none;min-height:80px;line-height:1.5}
+.fi select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%237a94b0' d='M6 8L0 0h12z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px}
+.fi select option{background:#1e2e42}
+.ab{display:flex;align-items:center;gap:6px;background:rgba(0,200,150,.1);border:1px solid rgba(0,200,150,.3);border-radius:8px;padding:9px 12px;font-size:14px;color:var(--ac);font-weight:500}
+.mr{display:flex;gap:8px}.mr textarea{flex:1}
+.bm{flex-shrink:0;width:42px;height:42px;border-radius:50%;border:1px solid var(--bd);background:var(--sf2);color:var(--t2);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.bm.rec{background:rgba(255,107,53,.2);border-color:var(--wn);color:var(--wn);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.bp{width:100%;padding:14px;background:var(--ac);border:none;border-radius:var(--r);color:#0a1a0f;font-family:var(--fh);font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:6px}
+.bp:active{transform:scale(.98)}.bp:disabled{opacity:.5;cursor:not-allowed}
+.gs{background:var(--sf);border:1px solid var(--ac);border-radius:var(--r);padding:20px;margin-top:10px;text-align:center}
+.dots{display:flex;gap:5px;justify-content:center;margin-bottom:10px}
+.dots span{width:8px;height:8px;border-radius:50%;background:var(--ac);animation:bounce .8s infinite}
+.dots span:nth-child(2){animation-delay:.15s}.dots span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-7px)}}
+.gt{font-size:13px;color:var(--t2)}
+.ic{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:12px;overflow:hidden}
+.ich{padding:14px;cursor:pointer;user-select:none}
+.ich:active{background:var(--sf2)}
+.ie{font-family:var(--fh);font-size:15px;font-weight:700;color:var(--tx)}
+.im{display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap}
+.id2{font-size:11px;color:var(--t2);background:var(--sf2);padding:2px 8px;border-radius:6px}
+.io{font-size:11px;color:var(--ac2)}
+.is{font-size:11px;padding:2px 8px;border-radius:6px;font-weight:600}
+.is.ok{background:rgba(0,200,150,.15);color:var(--ac)}
+.is.pend{background:rgba(255,107,53,.15);color:var(--wn)}
+.ich-row{display:flex;align-items:flex-start;justify-content:space-between}
+.chev{color:var(--t2);font-size:12px;transition:transform .2s;margin-left:8px;flex-shrink:0}
+.chev.open{transform:rotate(180deg)}
+.ib2{display:none;border-top:1px solid var(--bd);padding:14px}
+.ib2.show{display:block}
+.it{font-size:13px;line-height:1.75;color:var(--tx);background:var(--sf2);border-radius:10px;padding:14px;border:1px solid var(--bd);max-height:420px;overflow-y:auto}
+.it p{margin-bottom:8px}.it p:last-child{margin-bottom:0}
+.ia{display:flex;gap:8px;margin-top:12px}
+.bcp{flex:1;padding:10px;background:var(--sf2);border:1px solid var(--bd);border-radius:10px;color:var(--t2);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fb);transition:all .2s}
+.bcp.copied{background:rgba(0,200,150,.15);color:var(--ac);border-color:var(--ac)}
+.bml{flex:1;padding:10px;background:var(--ac2);border:none;border-radius:10px;color:white;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fb)}
+.brg{width:100%;padding:9px;background:transparent;border:1px solid var(--bd);border-radius:10px;color:var(--t2);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--fb);margin-top:8px;transition:all .2s}
+.brg:active{border-color:var(--ac);color:var(--ac)}
+.kg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.kc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:14px;text-align:center}
+.kc.a{border-color:rgba(0,200,150,.4);background:rgba(0,200,150,.06)}
+.kc.w{border-color:rgba(255,107,53,.4);background:rgba(255,107,53,.06)}
+.kc.b{border-color:rgba(0,152,255,.4);background:rgba(0,152,255,.06)}
+.kv{font-family:var(--fh);font-size:26px;font-weight:800;line-height:1;margin-bottom:4px}
+.kc.a .kv{color:var(--ac)}.kc.w .kv{color:var(--wn)}.kc.b .kv{color:var(--ac2)}
+.kc:not(.a):not(.w):not(.b) .kv{color:var(--tx)}
+.kl{font-size:11px;color:var(--t2)}
+.st{font-family:var(--fh);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t2);margin:14px 0 8px}
+.or{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.os2{font-size:16px;flex-shrink:0}
+.oi{flex:1;min-width:0}
+.oc{font-size:13px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.op2{font-size:11px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ov{font-size:12px;font-weight:600;color:var(--ac);flex-shrink:0;text-align:right}
+.ov small{display:block;font-size:10px;color:var(--t2);font-weight:400}
+.cb{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.cn{font-family:var(--fh);font-size:32px;font-weight:800;color:var(--ac)}
+.cl2{font-size:12px;color:var(--t2)}
+.cg{text-align:right}
+.cp2{font-size:16px;font-weight:700;color:var(--tx)}
+.pb{width:100%;height:6px;background:var(--sf2);border-radius:3px;margin-bottom:14px;overflow:hidden}
+.pf{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:3px;transition:width .5s}
+.sp{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,200,150,.3);border-top-color:var(--ac);border-radius:50%;animation:spi .7s linear infinite;vertical-align:middle;margin-right:5px}
+@keyframes spi{to{transform:rotate(360deg)}}
+.ib3{background:rgba(0,152,255,.08);border:1px solid rgba(0,152,255,.25);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--ac2);margin-bottom:12px;line-height:1.5}
+.empty{text-align:center;padding:50px 20px;color:var(--t2)}
+.empty .ei{font-size:44px;margin-bottom:10px;opacity:.4}
+.sov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;align-items:center;justify-content:center;padding:28px}
+.sov.show{display:flex}
+.scard{background:var(--sf);border:1px solid var(--ac);border-radius:20px;padding:28px 22px;text-align:center;max-width:320px;width:100%;animation:pop .3s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pop{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+.sic{width:58px;height:58px;background:rgba(0,200,150,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:24px}
+.scard h3{font-family:var(--fh);font-size:18px;font-weight:800;margin-bottom:6px;color:var(--ac)}
+.scard p{color:var(--t2);font-size:13px;line-height:1.5}
+.bok{margin-top:18px;width:100%;padding:12px;background:var(--ac);border:none;border-radius:12px;color:#0a1a0f;font-family:var(--fh);font-size:15px;font-weight:700;cursor:pointer}
+.setov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:300;align-items:center;justify-content:center;padding:22px}
+.setov.show{display:flex}
+.setcard{background:var(--sf);border:1px solid var(--ac);border-radius:20px;padding:26px 20px;max-width:340px;width:100%}
+.setcard h2{font-family:var(--fh);font-size:17px;font-weight:800;color:var(--ac);margin-bottom:7px}
+.setcard p{font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:12px}
+.setsteps{background:var(--sf2);border-radius:10px;padding:12px;margin-bottom:12px;font-size:12px;color:var(--t2);line-height:1.9}
+.setsteps a{color:var(--ac2);text-decoration:none}
+.kstat{border-radius:8px;padding:7px 11px;font-size:12px;margin-bottom:11px;display:flex;align-items:center;gap:6px}
+.kstat.ok{background:rgba(0,200,150,.1);color:var(--ac);border:1px solid rgba(0,200,150,.3)}
+.kstat.no{background:rgba(255,107,53,.1);color:var(--wn);border:1px solid rgba(255,107,53,.3)}
+.setin{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:10px;color:var(--tx);font-size:13px;padding:11px 12px;outline:none;margin-bottom:11px;font-family:monospace}
+.setin:focus{border-color:var(--ac)}
+.bsk{width:100%;padding:10px;background:transparent;border:none;color:var(--t2);font-size:13px;cursor:pointer;margin-top:6px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-top"><div class="logo">Midea Carrier</div><div class="db" id="hDate"></div></div>
+  <h1>CRM <span>Comercial</span></h1>
+</div>
+
+<div class="nav">
+  <button class="nb active" onclick="go('visita',this)">📋 Nueva Visita</button>
+  <button class="nb" onclick="go('informes',this)">📄 Informes</button>
+  <button class="nb" onclick="go('dashboard',this)">📊 Dashboard</button>
+  <button class="nb gear" onclick="abrirSetup()">⚙️</button>
+</div>
+
+<!-- NUEVA VISITA -->
+<div class="sc active" id="sc-visita">
+  <div class="ib3">💡 Completá los datos y el informe se genera automáticamente al guardar.</div>
+  <div class="fs">
+    <div class="sl">📍 Datos</div>
+    <div class="fi"><label>Fecha</label><div class="ab"><span>📅</span><span id="fAuto"></span><span style="margin-left:auto;font-size:11px;opacity:.6">Hoy</span></div></div>
+    <div class="fi"><label>Empresa *</label><input type="text" id="empresa" placeholder="Ej: SINAX SA" autocomplete="off"></div>
+    <div class="fi"><label>Participantes por el cliente</label><input type="text" id="pCli" placeholder="Ej: Alejandro Cunille, Gustavo Hartfiel"></div>
+    <div class="fi"><label>Participantes por Midea</label><input type="text" id="pMid" placeholder="Ej: Juan Escudero, Mauricio Colombo"></div>
+    <div class="fi"><label>Oportunidad relacionada</label><select id="opp"><option value="">— Sin oportunidad específica —</option></select></div>
+  </div>
+  <div class="fs">
+    <div class="sl">💬 Reunión <span style="font-size:10px;color:var(--t2);font-weight:400;letter-spacing:0;text-transform:none">— hablá o escribí libremente</span></div>
+    <div class="fi">
+      <label>Detalle *</label>
+      <div class="mr">
+        <textarea id="detalle" placeholder="Contá qué pasó, temas tratados, acuerdos, oportunidades, próximos pasos..." rows="6"></textarea>
+        <button class="bm" id="bMic" onclick="toggleMic()" title="Dictado por voz">🎙️</button>
+      </div>
+    </div>
+  </div>
+  <div id="genState" style="display:none">
+    <div class="gs"><div class="dots"><span></span><span></span><span></span></div><div class="gt">Guardando y generando informe con IA...</div></div>
+  </div>
+  <button class="bp" id="btnSave" onclick="guardarVisita()">💾 Guardar y Generar Informe</button>
+</div>
+
+<!-- INFORMES -->
+<div class="sc" id="sc-informes">
+  <div id="infCont"><div class="empty"><div class="ei">📄</div><p>Acá aparecen los informes<br>de tus visitas.</p></div></div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="sc" id="sc-dashboard">
+  <div class="cb">
+    <div><div class="cn" id="cntV">0</div><div class="cl2">visitas registradas</div></div>
+    <div class="cg"><div class="cp2" id="cntP">0%</div><div style="font-size:11px;color:var(--t2)">objetivo anual</div><div style="font-size:12px;color:var(--ac);margin-top:2px">Meta: 100 visitas</div></div>
+  </div>
+  <div class="pb"><div class="pf" id="pFill" style="width:0%"></div></div>
+  <div class="kg">
+    <div class="kc a"><div class="kv" id="kA">—</div><div class="kl">Activas</div></div>
+    <div class="kc"><div class="kv" id="kN">—</div><div class="kl">Negociación</div></div>
+    <div class="kc w"><div class="kv" id="kU">—</div><div class="kl">🔴 Urgentes</div></div>
+    <div class="kc b"><div class="kv">75%</div><div class="kl">Tasa cierre</div></div>
+  </div>
+  <div class="kc" style="margin-bottom:10px;text-align:left;padding:13px 15px"><div style="font-size:11px;color:var(--t2);margin-bottom:3px">PIPELINE ACTIVO</div><div class="kv" id="kP" style="color:var(--ac);font-size:22px">—</div></div>
+  <div class="kc" style="margin-bottom:16px;text-align:left;padding:13px 15px"><div style="font-size:11px;color:var(--t2);margin-bottom:3px">FORECAST PONDERADO</div><div class="kv" id="kF" style="color:var(--ac);font-size:22px">—</div></div>
+  <div class="st">Top 5 por valor</div>
+  <div id="topO"></div>
+</div>
+
+<!-- SUCCESS -->
+<div class="sov" id="sOv">
+  <div class="scard">
+    <div class="sic" id="sIc">✅</div>
+    <h3 id="sTit">¡Listo!</h3>
+    <p id="sMsg"></p>
+    <button class="bok" onclick="closeSuc()">Ver informe</button>
+  </div>
+</div>
+
+<!-- SETUP -->
+<div class="setov" id="setOv">
+  <div class="setcard">
+    <h2>🔑 Configurar IA</h2>
+    <p>Necesitás una API key de Anthropic para generar informes. Se guarda solo en tu celular.</p>
+    <div class="setsteps">
+      1. Entrá a <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a><br>
+      2. Comprá USD 5 de crédito (~1000 informes)<br>
+      3. Menú "API Keys" → "Create Key"<br>
+      4. Copiá la clave — empieza con sk-ant-...
+    </div>
+    <div class="kstat no" id="kStat"><span>🔴</span><span>Sin clave configurada</span></div>
+    <input class="setin" type="password" id="apiKey" placeholder="sk-ant-api03-...">
+    <button class="bp" onclick="saveKey()">Guardar clave</button>
+    <button class="bsk" onclick="cerrarSetup()">Continuar sin IA</button>
+  </div>
+</div>
+
+<script>
+const OPPS=[
+  {id:"O0002",cl:"D.K.M. S.A.",pr:"TECHINT 30XW0552",et:"Cotizado",val:74531,sem:"🟡"},
+  {id:"O0003",cl:"NEOCONFORT SRL",pr:"CHILLER 250TR",et:"Cotizado",val:190454,sem:"🔴"},
+  {id:"O0004",cl:"NEOCONFORT SRL",pr:"ROOFTOP 30TR LABORATORIOS",et:"Cotizado",val:67099,sem:"🔴"},
+  {id:"O0005",cl:"D.K.M. S.A.",pr:"CENCOSUD LOMAS",et:"Cotizado",val:150000,sem:"🔴"},
+  {id:"O0009",cl:"CEMI SA",pr:"Sanatorio Allende",et:"Cotizado",val:200000,sem:"🟡"},
+  {id:"O0010",cl:"INGENIERIA GLOBAL S.R.L",pr:"Sanatorio Allende",et:"Cotizado",val:200000,sem:"🟡"},
+  {id:"O0012",cl:"WASLEY S.A.",pr:"OBRA CORESA",et:"Negociacion",val:104827,sem:"🟡"},
+  {id:"O0013",cl:"WASLEY S.A.",pr:"Escudela Lincoln",et:"Negociacion",val:0,sem:"🟢"},
+  {id:"O0022",cl:"RSG TECNUM",pr:"Hospital Ramos Mejia",et:"Cotizado",val:62400,sem:"🟡"},
+  {id:"O0024",cl:"ENRIQUE ALEJANDRO CANO",pr:"Lorenzo",et:"Cotizado",val:32400,sem:"🟡"},
+  {id:"O0028",cl:"AIRE BAN SRL",pr:"Hospital Argerich",et:"Cotizado",val:80413,sem:"🟡"},
+  {id:"O0029",cl:"AIRE BAN SRL",pr:"Hospital Alvarez",et:"Cotizado",val:57522,sem:"🟡"},
+  {id:"O0031",cl:"AIRE BAN SRL",pr:"Hospital Durand",et:"Cotizado",val:99982,sem:"🟡"},
+  {id:"O0032",cl:"AIRE BAN SRL",pr:"Hospital Ramos Mejia",et:"Cotizado",val:79015,sem:"🟡"},
+  {id:"O0033",cl:"RSG TECNUM",pr:"Hospital Alvarez",et:"Cotizado",val:53904,sem:"🟡"},
+  {id:"O0034",cl:"ACONDICIONAR SRL",pr:"Edificio Esmeralda",et:"Cotizado",val:49222,sem:"🟡"},
+  {id:"O0037",cl:"INGENIERIA AHMAD S.R.L.",pr:"MC Rooftop",et:"Cotizado",val:187400,sem:"🟢"},
+  {id:"O0038",cl:"TECHTHERM",pr:"Palco Velez",et:"Cotizado",val:28316,sem:"🟢"},
+  {id:"O0040",cl:"REFRIMAC",pr:"Paseo San Nicolas",et:"Cotizado",val:34765,sem:"🟢"},
+  {id:"O0046",cl:"INGENIERIA GLOBAL S.R.L",pr:"Hermanados",et:"Cotizado",val:47913,sem:"🟢"},
+  {id:"O0048",cl:"PASSAIR",pr:"CIF",et:"Cotizado",val:228257,sem:"🟢"},
+  {id:"O0052",cl:"RSG TECNUM",pr:"Piñero Laboratorios",et:"Cotizado",val:93928,sem:"🟢"},
+  {id:"O0059",cl:"SINAX SA",pr:"Club Nautico",et:"Cotizado",val:0,sem:"🟢"},
+  {id:"O0062",cl:"SINAX SA",pr:"Laboratorio PANALAB",et:"Cotizado",val:0,sem:"🟢"},
+  {id:"O0063",cl:"INGENIERIA GLOBAL S.R.L.",pr:"Refinería del centro",et:"Negociacion",val:0,sem:"🟢"},
+];
+
+let visitas=JSON.parse(localStorage.getItem('crm_v')||'[]');
+let recognition=null,micOn=false;
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const now=new Date();
+  document.getElementById('hDate').textContent=now.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+  document.getElementById('fAuto').textContent=now.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const sel=document.getElementById('opp');
+  OPPS.forEach(o=>{const opt=document.createElement('option');opt.value=o.id;opt.textContent=`${o.id} · ${o.cl} — ${o.pr}`;sel.appendChild(opt);});
+  const k=localStorage.getItem('crm_key');
+  if(k){document.getElementById('kStat').className='kstat ok';document.getElementById('kStat').innerHTML='<span>✅</span><span>Clave configurada</span>';document.getElementById('apiKey').value=k;}
+  initMic();renderInformes();renderDashboard();
+});
+
+function go(n,btn){
+  document.querySelectorAll('.sc').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sc-'+n).classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(n==='informes')renderInformes();
+  if(n==='dashboard')renderDashboard();
+}
+
+function initMic(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){document.getElementById('bMic').style.display='none';return;}
+  recognition=new SR();recognition.lang='es-AR';recognition.continuous=true;recognition.interimResults=false;
+  recognition.onresult=e=>{let t='';for(let i=e.resultIndex;i<e.results.length;i++)t+=e.results[i][0].transcript+' ';const ta=document.getElementById('detalle');ta.value=(ta.value+t).trim();};
+  recognition.onend=()=>stopMic();recognition.onerror=()=>stopMic();
+}
+function toggleMic(){if(micOn){stopMic();return;}micOn=true;const b=document.getElementById('bMic');b.classList.add('rec');b.textContent='⏹️';try{recognition.start();}catch(e){}}
+function stopMic(){micOn=false;const b=document.getElementById('bMic');if(b){b.classList.remove('rec');b.textContent='🎙️';}try{recognition.stop();}catch(e){}}
+
+async function guardarVisita(){
+  const empresa=document.getElementById('empresa').value.trim();
+  const detalle=document.getElementById('detalle').value.trim();
+  if(!empresa||!detalle){alert('Completá Empresa y Detalle.');return;}
+  const btn=document.getElementById('btnSave');
+  btn.style.display='none';document.getElementById('genState').style.display='block';
+  const v={id:Date.now(),fecha:new Date().toISOString(),empresa,pCli:document.getElementById('pCli').value.trim(),pMid:document.getElementById('pMid').value.trim(),opp:document.getElementById('opp').value,detalle,informe:'',error:false};
+  visitas.unshift(v);localStorage.setItem('crm_v',JSON.stringify(visitas));
+  const apiKey=localStorage.getItem('crm_key');
+  if(apiKey){try{const inf=await callClaude(v,apiKey);visitas[0].informe=inf;localStorage.setItem('crm_v',JSON.stringify(visitas));}catch(e){visitas[0].error=true;localStorage.setItem('crm_v',JSON.stringify(visitas));}}
+  ['empresa','pCli','pMid','detalle'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('opp').value='';
+  btn.style.display='block';document.getElementById('genState').style.display='none';
+  const ok=!!visitas[0].informe;
+  document.getElementById('sIc').textContent=ok?'✅':'💾';
+  document.getElementById('sTit').textContent=ok?'¡Visita e informe listos!':'Visita guardada';
+  document.getElementById('sMsg').textContent=ok?`Informe de ${empresa} listo para enviar.`:apiKey?`Hubo un error generando el informe. Podés regenerarlo desde Informes.`:`Visita guardada. Configurá la API key (⚙️) para generar informes.`;
+  document.getElementById('sOv').classList.add('show');renderDashboard();
+}
+
+async function callClaude(v,key){
+  const fecha=new Date(v.fecha).toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'});
+  const prompt=`Sos asistente de un ejecutivo de cuenta de Midea Carrier (climatización industrial HVAC).
+Redactá un informe de visita comercial profesional en español formal argentino.
+
+Datos:
+- Empresa: ${v.empresa}
+- Fecha: ${fecha}
+${v.pCli?`- Participantes por ${v.empresa}: ${v.pCli}`:''}
+${v.pMid?`- Participantes por Midea Carrier: ${v.pMid}`:''}
+- Notas: ${v.detalle}
+
+Formato EXACTO:
+Asunto: Informe de visita – ${v.empresa}
+
+Estimados,
+
+[párrafo apertura con visita, fecha y participantes]
+
+[párrafos de desarrollo por tema]
+
+[párrafo cierre con próximos pasos]
+
+Saludos cordiales,
+${v.pMid||'Juan Manuel Escudero'}
+
+Reglas: corregí ortografía, mantené toda la info, usá lenguaje técnico HVAC, solo párrafos corridos sin viñetas.`;
+  const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+  if(!res.ok)throw new Error(res.status);
+  const d=await res.json();return d.content?.[0]?.text||'';
+}
+
+function closeSuc(){document.getElementById('sOv').classList.remove('show');go('informes',document.querySelectorAll('.nb')[1]);}
+
+function renderInformes(){
+  const c=document.getElementById('infCont');
+  if(!visitas.length){c.innerHTML='<div class="empty"><div class="ei">📄</div><p>Acá aparecen los informes<br>de tus visitas.</p></div>';return;}
+  c.innerHTML=visitas.map((v,i)=>{
+    const fs=new Date(v.fecha).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'2-digit'});
+    const opp=OPPS.find(o=>o.id===v.opp);
+    const st=v.informe?'✅ Informe listo':v.error?'⚠️ Error al generar':'⏳ Sin informe';
+    const sc=v.informe?'ok':'pend';
+    const itxt=v.informe?v.informe.split('\n').map(l=>l.trim()?`<p>${l}</p>`:'<br>').join('')
+      :v.error?'<p style="color:var(--wn)">No se pudo generar. Podés regenerarlo abajo.</p>'
+      :'<p style="color:var(--t2)">Sin informe. Configurá la API key (⚙️) y regenerá.</p>';
+    return`<div class="ic">
+      <div class="ich" onclick="tog(${i})">
+        <div class="ich-row">
+          <div><div class="ie">${v.empresa}</div>
+          <div class="im"><span class="id2">${fs}</span>${opp?`<span class="io">🔗 ${opp.pr}</span>`:''}</div>
+          <div style="margin-top:6px"><span class="is ${sc}">${st}</span></div></div>
+          <span class="chev" id="cv${i}">▼</span>
+        </div>
+      </div>
+      <div class="ib2" id="bd${i}">
+        <div class="it">${itxt}</div>
+        ${v.informe?`<div class="ia"><button class="bcp" id="bc${i}" onclick="cop(${i})">Copiar</button><button class="bml" onclick="eml(${i})">📧 Email</button></div>`:''}
+        ${(!v.informe||v.error)?`<button class="brg" onclick="regen(${i},this)">🔄 Generar informe ahora</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function tog(i){const b=document.getElementById('bd'+i),c=document.getElementById('cv'+i);b.classList.toggle('show');c.classList.toggle('open');}
+function cop(i){if(!visitas[i].informe)return;navigator.clipboard.writeText(visitas[i].informe).then(()=>{const b=document.getElementById('bc'+i);b.textContent='✓ Copiado';b.classList.add('copied');setTimeout(()=>{b.textContent='Copiar';b.classList.remove('copied');},2000);});}
+function eml(i){if(!visitas[i].informe)return;window.open(`mailto:?subject=${encodeURIComponent('Informe de visita – '+visitas[i].empresa)}&body=${encodeURIComponent(visitas[i].informe)}`);}
+async function regen(i,btn){
+  const k=localStorage.getItem('crm_key');
+  if(!k){abrirSetup();return;}
+  btn.disabled=true;btn.innerHTML='<span class="sp"></span>Generando...';
+  try{const inf=await callClaude(visitas[i],k);visitas[i].informe=inf;visitas[i].error=false;localStorage.setItem('crm_v',JSON.stringify(visitas));renderInformes();setTimeout(()=>tog(i),80);}
+  catch(e){btn.disabled=false;btn.innerHTML='🔄 Generar informe ahora';alert('Error. Verificá tu conexión y API key.');}
+}
+
+function abrirSetup(){document.getElementById('setOv').classList.add('show');}
+function cerrarSetup(){document.getElementById('setOv').classList.remove('show');}
+function saveKey(){
+  const k=document.getElementById('apiKey').value.trim();
+  if(!k||!k.startsWith('sk-')){alert('La clave debe empezar con sk-ant-...');return;}
+  localStorage.setItem('crm_key',k);
+  document.getElementById('kStat').className='kstat ok';document.getElementById('kStat').innerHTML='<span>✅</span><span>Clave guardada</span>';
+  setTimeout(()=>cerrarSetup(),600);
+}
+
+function renderDashboard(){
+  const act=OPPS.filter(o=>!['Ganado','Perdido','Hibernado'].includes(o.et)).length;
+  const neg=OPPS.filter(o=>o.et==='Negociacion').length;
+  const urg=OPPS.filter(o=>o.sem==='🔴').length;
+  const pip=OPPS.reduce((s,o)=>s+(o.val||0),0);
+  const fore=OPPS.reduce((s,o)=>{const p=o.et==='Negociacion'?.7:o.et==='Cotizado'?.35:.1;return s+(o.val||0)*p;},0);
+  document.getElementById('kA').textContent=act;document.getElementById('kN').textContent=neg;document.getElementById('kU').textContent=urg;
+  document.getElementById('kP').textContent='USD '+pip.toLocaleString('es-AR');document.getElementById('kF').textContent='USD '+Math.round(fore).toLocaleString('es-AR');
+  const n=visitas.length,pct=Math.min(Math.round(n/100*100),100);
+  document.getElementById('cntV').textContent=n;document.getElementById('cntP').textContent=pct+'%';document.getElementById('pFill').style.width=pct+'%';
+  document.getElementById('topO').innerHTML=[...OPPS].filter(o=>o.val>0).sort((a,b)=>b.val-a.val).slice(0,5).map(o=>`
+    <div class="or"><div class="os2">${o.sem}</div><div class="oi"><div class="oc">${o.cl}</div><div class="op2">${o.pr}</div></div><div class="ov">USD ${o.val.toLocaleString('es-AR')}<small>${o.et}</small></div></div>`).join('');
+}
+</script>
+</body>
+</html>
