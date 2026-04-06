@@ -182,6 +182,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-size:15px;m
 
 <div class="nav">
   <button class="nb active" onclick="go('visita',this)">📋 Visita</button>
+  <button class="nb" onclick="go('cotizar',this)">➕ Cotización</button>
   <button class="nb" onclick="go('clientes',this)">👥 Clientes</button>
   <button class="nb" onclick="go('opps',this)">💼 Oportunidades</button>
   <button class="nb" onclick="go('dashboard',this)">📊 Dashboard</button>
@@ -214,6 +215,59 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-size:15px;m
   </div>
   <div id="genState" style="display:none"><div class="gs"><div class="dots"><span></span><span></span><span></span></div><div class="gt">Guardando y generando informe con IA...</div></div></div>
   <button class="bp" id="btnSave" onclick="guardarVisita()">💾 Guardar y Generar Informe</button>
+</div>
+
+<!-- NUEVA COTIZACIÓN -->
+<div class="sc" id="sc-cotizar">
+  <div class="ib">💡 Registrá la cotización en el momento que la enviás al cliente.</div>
+  <div class="fs">
+    <div class="sl">👤 Cliente</div>
+    <div class="fi">
+      <label>Cliente *</label>
+      <div style="display:flex;gap:8px">
+        <select id="cq-cli" style="flex:1;background:var(--sf2);border:1px solid var(--bd);border-radius:10px;color:var(--tx);font-family:var(--fb);font-size:14px;padding:9px 11px;outline:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%237a94b0' d='M6 8L0 0h12z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:32px" onchange="toggleNuevoCli()">
+          <option value="">— Seleccioná un cliente —</option>
+          <option value="__nuevo__">+ Nuevo cliente...</option>
+        </select>
+      </div>
+      <input type="text" id="cq-cli-nuevo" placeholder="Nombre del nuevo cliente" style="display:none;margin-top:8px;width:100%;background:var(--sf2);border:1px solid var(--ac);border-radius:10px;color:var(--tx);font-family:var(--fb);font-size:14px;padding:9px 11px;outline:none">
+    </div>
+    <div class="fi"><label>Proyecto / Obra *</label><input type="text" id="cq-proj" placeholder="Ej: Hospital Ramos Mejía, Edificio Esmeralda..." autocomplete="off"></div>
+  </div>
+  <div class="fs">
+    <div class="sl">🔧 Equipo</div>
+    <div class="fi">
+      <label>Producto *</label>
+      <select id="cq-prod" style="width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:10px;color:var(--tx);font-family:var(--fb);font-size:14px;padding:9px 11px;outline:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%237a94b0' d='M6 8L0 0h12z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:32px">
+        <option value="">— Seleccioná producto —</option>
+        <option>VRF</option>
+        <option>Mini VRF</option>
+        <option>Chiller</option>
+        <option>Rooftop</option>
+        <option>Otro</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:8px">
+      <div class="fi" style="flex:1"><label>HP</label><input type="number" id="cq-hp" placeholder="Ej: 48" min="0"></div>
+      <div class="fi" style="flex:1"><label>Valor USD</label><input type="number" id="cq-val" placeholder="Ej: 45000" min="0"></div>
+    </div>
+  </div>
+  <div class="fs">
+    <div class="sl">📊 Contexto</div>
+    <div class="fi">
+      <label>Especificación</label>
+      <select id="cq-esp" style="width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:10px;color:var(--tx);font-family:var(--fb);font-size:14px;padding:9px 11px;outline:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%237a94b0' d='M6 8L0 0h12z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:32px">
+        <option value="">— Sin dato —</option>
+        <option value="Especificada">Especificada</option>
+        <option value="Abierta">Abierta</option>
+        <option value="Competencia">Competencia</option>
+      </select>
+    </div>
+    <div class="fi"><label>Competencia</label><input type="text" id="cq-comp" placeholder="Ej: Daikin, Trane, Samsung..." autocomplete="off"></div>
+    <div class="fi"><label>Observaciones</label><textarea id="cq-obs" rows="3" placeholder="Notas relevantes, condiciones, descuentos..."></textarea></div>
+    <div class="fi"><label>Próxima acción</label><input type="text" id="cq-acc" placeholder="Ej: Llamar la semana que viene, esperar respuesta..." autocomplete="off"></div>
+  </div>
+  <button class="bp" onclick="guardarCotizacion()">💾 Guardar Cotización</button>
 </div>
 
 <!-- CLIENTES -->
@@ -446,6 +500,87 @@ Solo párrafos corridos, sin viñetas, lenguaje técnico HVAC.`;
 function closeSuc(){document.getElementById('sOv').classList.remove('show');go('clientes',document.querySelectorAll('.nb')[1]);}
 
 // SAVE OPPS
+
+// ── NUEVA COTIZACIÓN
+function initCotizarScreen(){
+  const sel = document.getElementById('cq-cli');
+  // Clear existing options except first two
+  while(sel.options.length > 2) sel.remove(2);
+  // Get unique clients from opps, sorted
+  const clientes = [...new Set(opps.map(o=>o.cliente).filter(Boolean))].sort();
+  clientes.forEach(c=>{
+    const opt = document.createElement('option');
+    opt.value = c; opt.textContent = c;
+    sel.insertBefore(opt, sel.options[1]); // insert before "+ Nuevo cliente..."
+  });
+}
+
+function toggleNuevoCli(){
+  const sel = document.getElementById('cq-cli');
+  const inp = document.getElementById('cq-cli-nuevo');
+  inp.style.display = sel.value === '__nuevo__' ? 'block' : 'none';
+  if(sel.value === '__nuevo__') inp.focus();
+}
+
+function guardarCotizacion(){
+  // Get client
+  const selVal = document.getElementById('cq-cli').value;
+  const nuevoVal = document.getElementById('cq-cli-nuevo').value.trim();
+  const cliente = selVal === '__nuevo__' ? nuevoVal : selVal;
+  const proyecto = document.getElementById('cq-proj').value.trim();
+  const producto = document.getElementById('cq-prod').value;
+
+  if(!cliente || cliente === ''){alert('Seleccioná o ingresá un cliente.');return;}
+  if(!proyecto){alert('Ingresá el proyecto u obra.');return;}
+  if(!producto){alert('Seleccioná el producto.');return;}
+
+  // Generate new ID
+  const maxId = opps.reduce((m,o)=>{
+    const n = parseInt((o.id||'O0000').replace('O',''));
+    return n>m?n:m;
+  }, 70);
+  const newId = 'O' + String(maxId+1).padStart(4,'0');
+
+  const hoy = new Date().toISOString().split('T')[0];
+
+  const nueva = {
+    id: newId,
+    cliente: cliente,
+    proyecto: proyecto,
+    producto: producto,
+    hp: parseFloat(document.getElementById('cq-hp').value)||0,
+    valor: parseFloat(document.getElementById('cq-val').value)||0,
+    etapa: 'Cotizado',
+    ultimoContacto: hoy,
+    proximaAccion: document.getElementById('cq-acc').value.trim(),
+    fechaAccion: '',
+    especificacion: document.getElementById('cq-esp').value,
+    competencia: document.getElementById('cq-comp').value.trim(),
+    observaciones: document.getElementById('cq-obs').value.trim(),
+    semaforo: '🟢 OK',
+    score: 0,
+    motivoPerdida: '',
+  };
+
+  opps.unshift(nueva);
+  saveOpps();
+  renderDash();
+
+  // Reset form
+  document.getElementById('cq-cli').value='';
+  document.getElementById('cq-cli-nuevo').value='';
+  document.getElementById('cq-cli-nuevo').style.display='none';
+  ['cq-proj','cq-hp','cq-val','cq-comp','cq-obs','cq-acc'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('cq-prod').value='';
+  document.getElementById('cq-esp').value='';
+
+  // Show success
+  document.getElementById('sIc').textContent='✅';
+  document.getElementById('sTit').textContent='¡Cotización registrada!';
+  document.getElementById('sMsg').textContent=`${cliente} — ${proyecto} agregada como Cotizado.`;
+  document.getElementById('sOv').classList.add('show');
+}
+
 function saveOpps(){localStorage.setItem('crm_opps',JSON.stringify(opps));}
 
 // DÍAS SIN CONTACTO
