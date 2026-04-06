@@ -274,7 +274,7 @@ button.stat-pill:active{opacity:.7;transform:scale(.96)}
     <div class="fi"><label>Observaciones</label><textarea id="cq-obs" rows="3" placeholder="Notas relevantes, condiciones, descuentos..."></textarea></div>
     <div class="fi"><label>Próxima acción</label><input type="text" id="cq-acc" placeholder="Ej: Llamar la semana que viene, esperar respuesta..." autocomplete="off"></div>
   </div>
-  <button class="bp" onclick="guardarCotizacion()">💾 Guardar Cotización</button>
+  <button class="bp" id="btnCotizar" onclick="guardarCotizacion()">💾 Guardar Cotización</button>
 </div>
 
 <!-- CLIENTES -->
@@ -530,6 +530,10 @@ function toggleNuevoCli(){
 }
 
 function guardarCotizacion(){
+  const btnC = document.getElementById('btnCotizar');
+  if(btnC.disabled) return;
+  btnC.disabled = true;
+  btnC.textContent = 'Guardando...';
   // Get client
   const selVal = document.getElementById('cq-cli').value;
   const nuevoVal = document.getElementById('cq-cli-nuevo').value.trim();
@@ -537,9 +541,9 @@ function guardarCotizacion(){
   const proyecto = document.getElementById('cq-proj').value.trim();
   const producto = document.getElementById('cq-prod').value;
 
-  if(!cliente || cliente === ''){alert('Seleccioná o ingresá un cliente.');return;}
-  if(!proyecto){alert('Ingresá el proyecto u obra.');return;}
-  if(!producto){alert('Seleccioná el producto.');return;}
+  if(!cliente || cliente === ''){alert('Seleccioná o ingresá un cliente.');btnC.disabled=false;btnC.textContent='💾 Guardar Cotización';return;}
+  if(!proyecto){alert('Ingresá el proyecto u obra.');btnC.disabled=false;btnC.textContent='💾 Guardar Cotización';return;}
+  if(!producto){alert('Seleccioná el producto.');btnC.disabled=false;btnC.textContent='💾 Guardar Cotización';return;}
 
   // Generate new ID
   const maxId = opps.reduce((m,o)=>{
@@ -581,6 +585,9 @@ function guardarCotizacion(){
   document.getElementById('cq-prod').value='';
   document.getElementById('cq-esp').value='';
 
+  // Re-enable button
+  btnC.disabled = false;
+  btnC.textContent = '💾 Guardar Cotización';
   // Show success
   document.getElementById('sIc').textContent='✅';
   document.getElementById('sTit').textContent='¡Cotización registrada!';
@@ -589,6 +596,15 @@ function guardarCotizacion(){
 }
 
 function saveOpps(){localStorage.setItem('crm_opps',JSON.stringify(opps));}
+
+function eliminarOpp(id){
+  if(!confirm('¿Eliminar esta oportunidad? Esta acción no se puede deshacer.')) return;
+  opps = opps.filter(o => o.id !== id);
+  saveOpps();
+  renderDashboard();
+  renderOpps();
+  renderClientes();
+}
 
 // DÍAS SIN CONTACTO
 function diasSinContacto(ult){
@@ -702,7 +718,10 @@ function renderClientes(){
               <textarea rows="2" onchange="updO('${o.id}','observaciones',this.value)">${o.observaciones||''}</textarea>
             </div>
           </div>
-          <button onclick="togEdit('${uid}')" style="margin-top:6px;width:100%;padding:6px;background:transparent;border:1px solid var(--bd);border-radius:7px;color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--fb)" id="ebtn-${uid}">✏️ Editar</button>
+          <div style="display:flex;gap:6px;margin-top:6px">
+            <button onclick="togEdit('${uid}')" style="flex:1;padding:6px;background:transparent;border:1px solid var(--bd);border-radius:7px;color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--fb)" id="ebtn-${uid}">✏️ Editar</button>
+            <button onclick="eliminarOpp('${o.id}')" style="padding:6px 10px;background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.3);border-radius:7px;color:var(--wn);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--fb)">🗑️</button>
+          </div>
         </div>`;
       }).join('');
     }
