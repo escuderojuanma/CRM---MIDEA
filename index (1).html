@@ -691,6 +691,10 @@ function renderClientes(){
             ${o.producto?`<span style="font-size:10px;color:var(--t2)">🔧 ${o.producto}</span>`:''}
             ${o.competencia?`<span style="font-size:10px;color:var(--t2)">⚔️ ${o.competencia}</span>`:''}
           </div>
+          <!-- Botones siempre visibles -->
+          <div style="display:flex;gap:6px;margin-top:8px">
+            <button onclick="togEdit('${uid}')" style="flex:1;padding:7px;background:transparent;border:1px solid var(--bd);border-radius:7px;color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--fb)" id="ebtn-${uid}">✏️ Editar</button>
+            <button onclick="eliminarOpp('${o.id}')" style="padding:7px 14px;background:rgba(255,107,53,.12);border:1px solid rgba(255,107,53,.4);border-radius:7px;color:var(--wn);font-size:13px;cursor:pointer">🗑️</button>
           <!-- Edición inline -->
           <div id="edit-${uid}" style="display:none;border-top:1px solid var(--bd);padding-top:8px;margin-top:4px">
             <div style="display:flex;gap:7px;margin-bottom:7px">
@@ -718,10 +722,6 @@ function renderClientes(){
               <textarea rows="2" onchange="updO('${o.id}','observaciones',this.value)">${o.observaciones||''}</textarea>
             </div>
           </div>
-          <!-- Botones siempre visibles -->
-          <div style="display:flex;gap:6px;margin-top:8px">
-            <button onclick="togEdit('${uid}')" style="flex:1;padding:7px;background:transparent;border:1px solid var(--bd);border-radius:7px;color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--fb)" id="ebtn-${uid}">✏️ Editar</button>
-            <button onclick="eliminarOpp('${o.id}')" style="padding:7px 14px;background:rgba(255,107,53,.12);border:1px solid rgba(255,107,53,.4);border-radius:7px;color:var(--wn);font-size:13px;cursor:pointer">🗑️</button>
           </div>
         </div>`;
       }).join('');
