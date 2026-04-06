@@ -61,10 +61,17 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-size:15px;m
 .cli-name{font-family:var(--fh);font-size:14px;font-weight:700;color:var(--tx);margin-bottom:6px}
 .cli-stats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
 .stat-pill{font-size:11px;padding:3px 8px;border-radius:6px;font-weight:600}
+button.stat-pill{border:none;cursor:pointer;font-family:var(--fb);transition:all .15s}
+button.stat-pill:active{opacity:.7;transform:scale(.96)}
 .sp-ok{background:rgba(0,200,150,.15);color:var(--ac)}
 .sp-warn{background:rgba(255,107,53,.15);color:var(--wn)}
 .sp-gray{background:var(--sf2);color:var(--t2)}
 .sp-blue{background:rgba(0,152,255,.15);color:var(--ac2)}
+.sp-bl{background:rgba(0,152,255,.15);color:var(--ac2)}
+.sp-ac{background:rgba(0,200,150,.15);color:var(--ac)}
+.sp-gg{background:rgba(0,200,150,.2);color:var(--ac)}
+.sp-wn{background:rgba(255,107,53,.15);color:var(--wn)}
+.sp-gy{background:var(--sf2);color:var(--t2);border:1px solid var(--bd)}
 .cli-ult{font-size:11px;color:var(--t2);display:flex;align-items:center;gap:5px}
 .cli-body{display:none;border-top:1px solid var(--bd);padding:12px 14px;background:var(--sf2)}
 .cli-body.show{display:block}
@@ -605,23 +612,21 @@ function renderClientes(){
   const q=(document.getElementById('cli-search').value||'').toLowerCase();
   const c=document.getElementById('cliContainer');
   
-  // Group opps by cliente
   const clienteMap={};
   opps.forEach(o=>{
     if(!o.cliente)return;
-    if(!clienteMap[o.cliente])clienteMap[o.cliente]={opps:[],lastVisit:null,lastVisitDate:null};
+    if(!clienteMap[o.cliente])clienteMap[o.cliente]={opps:[],visitas:[],lastVisitDate:null};
     clienteMap[o.cliente].opps.push(o);
   });
   
-  // Add visitas to clients
   visitas.forEach(v=>{
-    const key=Object.keys(clienteMap).find(k=>k.toLowerCase().includes(v.empresa.toLowerCase())||v.empresa.toLowerCase().includes(k.toLowerCase()));
+    const key=Object.keys(clienteMap).find(k=>
+      k.toLowerCase()===v.empresa.toLowerCase()||
+      k.toLowerCase().includes(v.empresa.toLowerCase().replace(/s\.r\.l\.|srl|s\.a\.|sa\b/g,'').trim())||
+      v.empresa.toLowerCase().includes(k.toLowerCase().replace(/s\.r\.l\.|srl|s\.a\.|sa\b/g,'').trim())
+    );
     if(key){
-      if(!clienteMap[key].lastVisitDate||v.fecha>clienteMap[key].lastVisitDate){
-        clienteMap[key].lastVisitDate=v.fecha;
-        clienteMap[key].lastVisit=v;
-      }
-      if(!clienteMap[key].visitas)clienteMap[key].visitas=[];
+      if(!clienteMap[key].lastVisitDate||v.fecha>clienteMap[key].lastVisitDate) clienteMap[key].lastVisitDate=v.fecha;
       clienteMap[key].visitas.push(v);
     }
   });
@@ -634,73 +639,174 @@ function renderClientes(){
   
   c.innerHTML=clientes.map(([nombre,data],i)=>{
     const os=data.opps;
-    const cotizadas=os.filter(o=>o.etapa==='Cotizado').length;
-    const negoc=os.filter(o=>o.etapa==='Negociacion').length;
-    const ganadas=os.filter(o=>o.etapa==='Ganado').length;
-    const perdidas=os.filter(o=>o.etapa==='Perdido').length;
-    const hibernadas=os.filter(o=>o.etapa==='Hibernado').length;
-    const activas=cotizadas+negoc+os.filter(o=>o.etapa==='Lead').length;
+    const leads=os.filter(o=>o.etapa==='Lead');
+    const cotizadas=os.filter(o=>o.etapa==='Cotizado');
+    const negocios=os.filter(o=>o.etapa==='Negociacion');
+    const ganadas=os.filter(o=>o.etapa==='Ganado');
+    const perdidas=os.filter(o=>o.etapa==='Perdido');
+    const hibernadas=os.filter(o=>o.etapa==='Hibernado');
+    const activas=[...leads,...cotizadas,...negocios];
     
-    let ultVisStr='Sin visitas';
-    let diasStr='';
+    let ultVisStr='Sin visitas'; let diasStr='';
     if(data.lastVisitDate){
-      const dias=Math.floor((new Date()-new Date(data.lastVisitDate))/(1000*60*60*24));
+      const dd=Math.floor((new Date()-new Date(data.lastVisitDate))/(1000*60*60*24));
       ultVisStr=new Date(data.lastVisitDate).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'2-digit'});
-      diasStr=dias<=0?'Hoy':dias===1?'Hace 1 día':`Hace ${dias} días`;
+      diasStr=dd<=0?'Hoy':dd===1?'Hace 1 día':`Hace ${dd} días`;
     }
     
-    // Visitas ordenadas de más nueva a más vieja
-    const vsorted=(data.visitas||[]).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+    // Build opp rows for a given list
+    const etClasses={Cotizado:'ec',Negociacion:'en',Lead:'el',Ganado:'eg',Perdido:'ep',Hibernado:'eh'};
+    function oppRows(list){
+      if(!list.length) return '<p style="font-size:12px;color:var(--t2);padding:6px 0">Sin oportunidades en esta categoría.</p>';
+      return list.map(o=>{
+        const d2=dias(o.ultimoContacto);
+        const vStr=o.valor>0?'USD '+o.valor.toLocaleString('es-AR'):'—';
+        const dStr=d2<999?(d2===0?'Hoy':d2===1?'1 día':`${d2} días`):'Sin registro';
+        const ec=etClasses[o.etapa]||'ec';
+        const uid='cli_'+o.id;
+        return `<div style="background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin-bottom:7px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+            <div style="font-size:13px;font-weight:600;color:var(--tx);flex:1;margin-right:8px">${o.proyecto||'Sin proyecto'}</div>
+            <div style="font-size:12px;font-weight:700;color:var(--ac);flex-shrink:0">${vStr}</div>
+          </div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px">
+            <span class="etag ${ec}">${o.etapa}</span>
+            <span style="font-size:10px;color:var(--t2)">📅 ${dStr}</span>
+            ${o.producto?`<span style="font-size:10px;color:var(--t2)">🔧 ${o.producto}</span>`:''}
+            ${o.competencia?`<span style="font-size:10px;color:var(--t2)">⚔️ ${o.competencia}</span>`:''}
+          </div>
+          <!-- Edición inline -->
+          <div id="edit-${uid}" style="display:none;border-top:1px solid var(--bd);padding-top:8px;margin-top:4px">
+            <div style="display:flex;gap:7px;margin-bottom:7px">
+              <div class="fi" style="flex:1;margin-bottom:0"><label>Etapa</label>
+                <select onchange="updO('${o.id}','etapa',this.value)">
+                  ${['Lead','Cotizado','Negociacion','Ganado','Perdido','Hibernado'].map(e=>`<option ${o.etapa===e?'selected':''}>${e}</option>`).join('')}
+                </select>
+              </div>
+              <div class="fi" style="flex:1;margin-bottom:0"><label>Últ. contacto</label>
+                <input type="date" value="${o.ultimoContacto||''}" onchange="updO('${o.id}','ultimoContacto',this.value);renderClientes()">
+              </div>
+            </div>
+            <div style="display:flex;gap:7px;margin-bottom:7px">
+              <div class="fi" style="flex:1;margin-bottom:0"><label>Valor USD</label>
+                <input type="number" value="${o.valor||''}" placeholder="0" onchange="updO('${o.id}','valor',parseFloat(this.value)||0)">
+              </div>
+              <div class="fi" style="flex:1;margin-bottom:0"><label>Competencia</label>
+                <input type="text" value="${o.competencia||''}" placeholder="Daikin, Trane..." onchange="updO('${o.id}','competencia',this.value)">
+              </div>
+            </div>
+            <div class="fi" style="margin-bottom:7px"><label>Próxima acción</label>
+              <input type="text" value="${o.proximaAccion||''}" placeholder="¿Qué sigue?" onchange="updO('${o.id}','proximaAccion',this.value)">
+            </div>
+            <div class="fi" style="margin-bottom:0"><label>Observaciones</label>
+              <textarea rows="2" onchange="updO('${o.id}','observaciones',this.value)">${o.observaciones||''}</textarea>
+            </div>
+          </div>
+          <button onclick="togEdit('${uid}')" style="margin-top:6px;width:100%;padding:6px;background:transparent;border:1px solid var(--bd);border-radius:7px;color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--fb)" id="ebtn-${uid}">✏️ Editar</button>
+        </div>`;
+      }).join('');
+    }
     
+    // Build visitas section
+    const vsorted=data.visitas.sort((a,b)=>b.fecha.localeCompare(a.fecha));
     const visitasHtml=vsorted.length?vsorted.map(v=>{
       const fd=new Date(v.fecha).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'2-digit'});
-      const temas=v.detalle?v.detalle.substring(0,150)+(v.detalle.length>150?'...':''):'Sin detalle';
+      const det=v.detalle?v.detalle.substring(0,160)+(v.detalle.length>160?'...':''):'';
       const infHtml=v.informe?`
-        <div class="inf-mini">
-          ${v.informe.split('\n').filter(l=>l.trim()).slice(0,8).map(l=>`<p>${l}</p>`).join('')}
-        </div>
-        <div class="inf-actions-mini">
-          <button class="bc2" id="bc-${v.id}" onclick="copInf(${v.id})">Copiar informe</button>
-          <button class="bml2" onclick="emlInf(${v.id})">📧 Email</button>
-        </div>`:
-        '<p style="font-size:11px;color:var(--t2);margin-top:6px">Sin informe generado</p>';
-      return `<div class="visit-item">
-        <div class="vi-head"><div class="vi-emp">${v.empresa}</div><div class="vi-date">${fd}</div></div>
-        <div class="vi-det">📝 ${temas}</div>
-        ${v.proximoPaso?`<div class="vi-next">→ ${v.proximoPaso}</div>`:''}
-        ${infHtml}
-      </div>`;
-    }).join(''):'<p style="font-size:12px;color:var(--t2);padding:8px 0">No hay visitas registradas para este cliente.</p>';
-    
+        <div class="vi-inf">${v.informe.split('\n').filter(l=>l.trim()).slice(0,8).map(l=>`<p>${l}</p>`).join('')}</div>
+        <div class="vi-actions"><button class="vi-btn" id="vbc-${v.id}" onclick="copV(${v.id})">📋 Copiar</button><button class="vi-btn-mail" onclick="emlV(${v.id})">📧 Email</button></div>`
+        :'<p style="font-size:11px;color:var(--t2);margin-top:5px">Sin informe generado</p>';
+      return `<div class="vi-item"><div class="vi-head"><span class="vi-emp">${v.empresa}</span><span class="vi-date">${fd}</span></div>${det?`<div class="vi-det">📝 ${det}</div>`:''}${infHtml}</div>`;
+    }).join(''):'<p style="font-size:12px;color:var(--t2);padding:6px 0">Sin visitas registradas.</p>';
+
+    // Pill buttons — only show groups that exist
+    const pillBtns = [
+      activas.length   ? `<button class="stat-pill sp-bl" onclick="togSection('${i}','activas')">${activas.length} activa${activas.length>1?'s':''}</button>` : '',
+      negocios.length  ? `<button class="stat-pill sp-ac" onclick="togSection('${i}','negoc')">${negocios.length} negoc.</button>` : '',
+      ganadas.length   ? `<button class="stat-pill sp-gg" onclick="togSection('${i}','ganadas')">✅ ${ganadas.length} ganada${ganadas.length>1?'s':''}</button>` : '',
+      perdidas.length  ? `<button class="stat-pill sp-wn" onclick="togSection('${i}','perdidas')">❌ ${perdidas.length} perdida${perdidas.length>1?'s':''}</button>` : '',
+      hibernadas.length? `<button class="stat-pill sp-gy" onclick="togSection('${i}','hibern')">❄️ ${hibernadas.length} hibern.</button>` : '',
+      vsorted.length   ? `<button class="stat-pill sp-gy" onclick="togSection('${i}','visitas')">📋 ${vsorted.length} visita${vsorted.length>1?'s':''}</button>` : '',
+    ].filter(Boolean).join('');
+
     return `<div class="cli-card" id="cli-${i}">
-      <div class="cli-head" onclick="toggleCli(${i})">
-        <div class="cli-name">${nombre}</div>
-        <div class="cli-stats">
-          ${activas?`<span class="stat-pill sp-blue">${activas} activas</span>`:''}
-          ${negoc?`<span class="stat-pill sp-ok">${negoc} negoc.</span>`:''}
-          ${ganadas?`<span class="stat-pill sp-ok">✅ ${ganadas} ganadas</span>`:''}
-          ${perdidas?`<span class="stat-pill sp-warn">❌ ${perdidas} perdidas</span>`:''}
-          ${hibernadas?`<span class="stat-pill sp-gray">❄️ ${hibernadas} hibern.</span>`:''}
-        </div>
-        <div class="cli-ult">
-          <span>📅 Última visita: ${ultVisStr}</span>
-          ${diasStr?`<span style="color:${parseInt(diasStr)>21?'var(--wn)':'var(--t2)'}">${diasStr}</span>`:''}
-          <span style="margin-left:auto;font-size:12px;color:var(--t2)">▼</span>
-        </div>
+      <div class="cli-head" style="cursor:default">
+        <div class="cli-name" style="font-family:var(--fh);font-size:14px;font-weight:700;color:var(--tx);margin-bottom:7px">${nombre}</div>
+        <div class="cli-stats" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">${pillBtns}</div>
+        <div class="cli-ult"><span>📅 Última visita: ${ultVisStr}</span>${diasStr?`<span style="color:var(--t2)">${diasStr}</span>`:''}</div>
       </div>
-      <div class="cli-body" id="clibody-${i}">
-        <div style="font-family:var(--fh);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ac);margin-bottom:8px">HISTORIAL DE VISITAS</div>
+      <!-- ACTIVAS -->
+      <div class="cli-body" id="sec-${i}-activas">
+        <div style="font-family:var(--fh);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ac);margin-bottom:8px">OPORTUNIDADES ACTIVAS</div>
+        ${oppRows(activas)}
+      </div>
+      <!-- NEGOCIACION -->
+      <div class="cli-body" id="sec-${i}-negoc">
+        <div style="font-family:var(--fh);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ac);margin-bottom:8px">EN NEGOCIACIÓN</div>
+        ${oppRows(negocios)}
+      </div>
+      <!-- GANADAS -->
+      <div class="cli-body" id="sec-${i}-ganadas">
+        <div style="font-family:var(--fh);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ac);margin-bottom:8px">GANADAS</div>
+        ${oppRows(ganadas)}
+      </div>
+      <!-- PERDIDAS -->
+      <div class="cli-body" id="sec-${i}-perdidas">
+        <div style="font-family:var(--fh);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ac);margin-bottom:8px">PERDIDAS</div>
+        ${oppRows(perdidas)}
+      </div>
+      <!-- HIBERNADAS -->
+      <div class="cli-body" id="sec-${i}-hibern">
+        <div style="font-family:var(--fh);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ac);margin-bottom:8px">HIBERNADAS</div>
+        ${oppRows(hibernadas)}
+      </div>
+      <!-- VISITAS -->
+      <div class="cli-body" id="sec-${i}-visitas">
+        <div style="font-family:var(--fh);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ac);margin-bottom:8px">HISTORIAL DE VISITAS</div>
         ${visitasHtml}
       </div>
     </div>`;
   }).join('');
 }
 
-function toggleCli(i){
-  const b=document.getElementById('clibody-'+i);
-  b.classList.toggle('show');
+function togSection(i, sec){
+  // Toggle the clicked section, close others of same card
+  const secs=['activas','negoc','ganadas','perdidas','hibern','visitas'];
+  secs.forEach(s=>{
+    const el=document.getElementById(`sec-${i}-${s}`);
+    if(!el)return;
+    if(s===sec){el.classList.toggle('show');}
+    else{el.classList.remove('show');}
+  });
 }
 
+function togEdit(uid){
+  const el=document.getElementById('edit-'+uid);
+  const btn=document.getElementById('ebtn-'+uid);
+  if(!el)return;
+  const open=el.style.display==='block';
+  el.style.display=open?'none':'block';
+  btn.textContent=open?'✏️ Editar':'✕ Cerrar';
+}
+
+function toggleCli(i){
+  const b=document.getElementById('clibody-'+i);
+  if(b)b.classList.toggle('show');
+}
+
+function copV(id){
+  const v=visitas.find(x=>x.id===id);
+  if(!v||!v.informe)return;
+  navigator.clipboard.writeText(v.informe).then(()=>{
+    const b=document.getElementById('vbc-'+id);
+    if(b){b.textContent='✓ Copiado';b.classList.add('cp');setTimeout(()=>{b.textContent='📋 Copiar';b.classList.remove('cp');},2000);}
+  });
+}
+function emlV(id){
+  const v=visitas.find(x=>x.id===id);
+  if(!v||!v.informe)return;
+  window.open(`mailto:?subject=${encodeURIComponent('Informe de visita – '+v.empresa)}&body=${encodeURIComponent(v.informe)}`);
+}
 function copInf(id){
   const v=visitas.find(x=>x.id===id);
   if(!v||!v.informe)return;
