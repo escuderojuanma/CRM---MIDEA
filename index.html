@@ -659,7 +659,7 @@ function renderClientes(){
     function oppRows(list){
       if(!list.length) return '<p style="font-size:12px;color:var(--t2);padding:6px 0">Sin oportunidades en esta categoría.</p>';
       return list.map(o=>{
-        const d2=dias(o.ultimoContacto);
+        const d2=diasSinContacto(o.ultimoContacto);
         const vStr=o.valor>0?'USD '+o.valor.toLocaleString('es-AR'):'—';
         const dStr=d2<999?(d2===0?'Hoy':d2===1?'1 día':`${d2} días`):'Sin registro';
         const ec=etClasses[o.etapa]||'ec';
