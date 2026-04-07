@@ -936,6 +936,25 @@ function toggleOpp(uid){
   b.classList.toggle('show');
 }
 
+function updO(id, campo, valor){
+  const idx = opps.findIndex(o => o.id === id);
+  if(idx < 0) return;
+  opps[idx][campo] = valor;
+  // Recalc semaforo
+  const d = diasSinContacto(opps[idx].ultimoContacto);
+  const e = opps[idx].etapa;
+  if(e==='Ganado') opps[idx].semaforo='✅ Ganado';
+  else if(e==='Perdido') opps[idx].semaforo='❌ Perdido';
+  else if(e==='Hibernado') opps[idx].semaforo='❄️ Hibernado';
+  else if(d>21) opps[idx].semaforo='🔴 URGENTE';
+  else if(d>10||e==='Negociacion') opps[idx].semaforo='🟡 ATENCIÓN';
+  else opps[idx].semaforo='🟢 OK';
+  saveOpps();
+  renderDashboard();
+  // Refresh clientes view to update pills
+  renderClientes();
+}
+
 function updateOpp(id,campo,valor){
   const idx=opps.findIndex(o=>o.id===id);
   if(idx<0)return;
