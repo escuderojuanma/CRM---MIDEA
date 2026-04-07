@@ -511,14 +511,15 @@ function closeSuc(){document.getElementById('sOv').classList.remove('show');go('
 // ── NUEVA COTIZACIÓN
 function initCotizarScreen(){
   const sel = document.getElementById('cq-cli');
-  // Clear existing options except first two
   while(sel.options.length > 2) sel.remove(2);
-  // Get unique clients from opps, sorted
-  const clientes = [...new Set(opps.map(o=>o.cliente).filter(Boolean))].sort();
-  clientes.forEach(c=>{
+  // Merge base list with clients from opps, deduplicated and sorted
+  const BASE_CLIENTES = ["AC TERMOMECANICA SA", "ACONDICIONAR SRL", "ACP GROUP", "AIRE BAN SRL", "AIRE CONFORT S.A.", "ALEJANDRO MARCELO ELVIRA / HOTZA", "ARCADUZ SA", "BADENIA", "BD SERVICIOS", "BERNARDI MATIAS FRANCISCO", "BERTANI TERMOSOLUCIONES S.A.", "CEMI SA", "CIFALA LETTERIO", "CORRALON FRANCO Y HERMANOS SRL", "D.K.M. S.A.", "E&A (Enfriadoras y Acondicionadoras)", "ENRIQUE ALEJANDRO CANO", "GARCIA GUTIERREZ NELSON ALEXANDER", "HIJOS Y NIETOS DE MARIA", "INGENIERIA AHMAD S.R.L.", "INGENIERIA GLOBAL S.R.L", "INSTALTEC", "LIDER COMERCIAL", "MYLUS SRL", "NEOCONFORT SRL", "PASSAIR", "PONCE ALBERTO DARIO", "PRINEL S.R.L.", "QUINTRAL SERVICIOS S.R.L.", "REFRIMAC", "RSG TECNUM", "SANITARIOS MITRE", "SERVICIOS DE INGENIERIA", "SGM HVAC", "SINAX SA", "TECHTHERM", "WASLEY S.A."];
+  const fromOpps = opps.map(o=>o.cliente).filter(Boolean);
+  const todos = [...new Set([...BASE_CLIENTES, ...fromOpps])].sort((a,b)=>a.localeCompare(b));
+  todos.forEach(c=>{
     const opt = document.createElement('option');
     opt.value = c; opt.textContent = c;
-    sel.insertBefore(opt, sel.options[1]); // insert before "+ Nuevo cliente..."
+    sel.insertBefore(opt, sel.options[sel.options.length-1]); // insert before last option (+ Nuevo)
   });
 }
 
