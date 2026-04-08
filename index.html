@@ -361,6 +361,16 @@ button.stat-pill:active{opacity:.7;transform:scale(.96)}
     <input class="setin" type="password" id="apiKey" placeholder="sk-ant-api03-...">
     <button class="bp" onclick="saveKey()">Guardar clave</button>
     <button class="bsk" onclick="cerrarSetup()">Continuar sin IA</button>
+    <div style="border-top:1px solid var(--bd);margin-top:16px;padding-top:14px">
+      <div style="font-family:var(--fh);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t2);margin-bottom:10px">💾 BACKUP DE DATOS</div>
+      <p style="font-size:11px;color:var(--t2);margin-bottom:10px;line-height:1.5">Exportá tus datos antes de limpiar el historial del navegador. Para restaurar, importá el archivo.</p>
+      <button class="bp" onclick="exportarDatos()" style="margin-bottom:8px;background:var(--sf2);color:var(--tx);border:1px solid var(--bd)">📥 Exportar datos</button>
+      <label style="display:block;width:100%;padding:11px;background:transparent;border:1px solid var(--bd);border-radius:var(--r);color:var(--t2);font-family:var(--fh);font-size:13px;font-weight:700;cursor:pointer;text-align:center;margin-top:0">
+        📤 Importar datos
+        <input type="file" accept=".json" onchange="importarDatos(this)" style="display:none">
+      </label>
+      <div id="importMsg" style="font-size:11px;color:var(--ac);margin-top:8px;text-align:center"></div>
+    </div>
   </div>
 </div>
 
@@ -1062,6 +1072,47 @@ function renderDashboard(){
 // SETUP
 function abrirSetup(){document.getElementById('setOv').classList.add('show');}
 function cerrarSetup(){document.getElementById('setOv').classList.remove('show');}
+function exportarDatos(){
+  const datos = {
+    opps: opps,
+    visitas: visitas,
+    exportado: new Date().toISOString(),
+    version: 'CRM-Midea-v4'
+  };
+  const blob = new Blob([JSON.stringify(datos, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const fecha = new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'}).replace(/\//g,'-');
+  a.href = url;
+  a.download = `CRM-Midea-backup-${fecha}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importarDatos(input){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try{
+      const datos = JSON.parse(e.target.result);
+      if(!datos.opps||!datos.visitas) throw new Error('Archivo inválido');
+      opps = datos.opps;
+      visitas = datos.visitas;
+      localStorage.setItem('crm_opps', JSON.stringify(opps));
+      localStorage.setItem('crm_v', JSON.stringify(visitas));
+      document.getElementById('importMsg').textContent = `✅ ${opps.length} oportunidades y ${visitas.length} visitas restauradas.`;
+      renderDashboard();
+      renderOpps();
+      setTimeout(()=>{document.getElementById('importMsg').textContent='';},4000);
+    }catch(err){
+      document.getElementById('importMsg').textContent = '❌ Archivo inválido. Usá un backup generado por esta app.';
+      document.getElementById('importMsg').style.color = 'var(--wn)';
+    }
+  };
+  reader.readAsText(file);
+}
+
 function saveKey(){
   const k=document.getElementById('apiKey').value.trim();
   if(!k||!k.startsWith('sk-')){alert('La clave debe empezar con sk-ant-...');return;}
