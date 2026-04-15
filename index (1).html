@@ -647,6 +647,17 @@ function eliminarOpp(id){
 }
 
 // DÍAS SIN CONTACTO
+function calcSemaforo(o){
+  const e = o.etapa;
+  if(e==='Ganado') return '✅ Ganado';
+  if(e==='Perdido') return '❌ Perdido';
+  if(e==='Hibernado') return '❄️ Hibernado';
+  const d = diasSinContacto(o.ultimoContacto);
+  if(d>21) return '🔴 URGENTE';
+  if(d>10 || e==='Negociacion') return '🟡 ATENCIÓN';
+  return '🟢 OK';
+}
+
 function diasSinContacto(ult){
   if(!ult)return 999;
   const d=new Date(ult);
@@ -929,7 +940,7 @@ function renderOpps(filtro){
         <div class="opp-meta">
           <span class="opp-etapa ${etapaClass}">${o.etapa}</span>
           <span class="opp-dias">📅 ${diasStr}</span>
-          ${o.semaforo?`<span class="opp-sem">${o.semaforo}</span>`:''}
+          ${calcSemaforo(o)?`<span class="opp-sem">${calcSemaforo(o)}</span>`:''}
           ${o.especificacion?`<span class="opp-dias">📌 ${o.especificacion}</span>`:''}
         </div>
       </div>
@@ -1056,7 +1067,7 @@ function renderDashboard(){
     const sc=semClass(dias,o.etapa);
     const sem=sc==='urgente'?'🔴':sc==='atencion'?'🟡':'🟢';
     return `<div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:9px 11px;margin-bottom:7px;display:flex;align-items:center;gap:9px;cursor:pointer" onclick="irAOpps('activas')">
-      <div style="font-size:14px;flex-shrink:0">${sem}</div>
+      <div style="font-size:14px;flex-shrink:0">${calcSemaforo(o).split(' ')[0]}</div>
       <div style="flex:1;min-width:0">
         <div style="font-size:12px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${o.cliente}</div>
         <div style="font-size:10px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${o.proyecto}</div>
