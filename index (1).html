@@ -118,6 +118,8 @@ button.stat-pill:active{opacity:.7;transform:scale(.96)}
 .kc.w{border-color:rgba(255,107,53,.4);background:rgba(255,107,53,.06)}
 .kc.b{border-color:rgba(0,152,255,.4);background:rgba(0,152,255,.06)}
 .kc.g{border-color:rgba(0,200,150,.3);background:rgba(0,200,150,.04)}
+.kc.am{border-color:rgba(255,167,53,.4);background:rgba(255,167,53,.06)}
+.kc.am .kv{color:#ff9f35}
 .kv{font-family:var(--fh);font-size:24px;font-weight:800;line-height:1;margin-bottom:3px}
 .kc.a .kv{color:var(--ac)}.kc.w .kv{color:var(--wn)}.kc.b .kv{color:var(--ac2)}.kc.g .kv{color:var(--ac)}
 .kc:not(.a):not(.w):not(.b):not(.g) .kv{color:var(--tx)}
@@ -317,11 +319,17 @@ button.stat-pill:active{opacity:.7;transform:scale(.96)}
     <div class="kc w clickable" onclick="irAOpps('urgentes')">
       <div class="kv" id="kU">—</div><div class="kl">🔴 Urgentes</div>
     </div>
+    <div class="kc am clickable" onclick="irAOpps('atencion')">
+      <div class="kv" id="kAt">—</div><div class="kl">🟡 Atención</div>
+    </div>
     <div class="kc b clickable" onclick="irAOpps('Negociacion')">
       <div class="kv" id="kN">—</div><div class="kl">Negociación</div>
     </div>
     <div class="kc g btn" onclick="irAOpps('Ganado')">
       <div class="kv" id="kG">—</div><div class="kl">✅ Ganadas</div>
+    </div>
+    <div class="kc" style="cursor:default">
+      <div class="kv" id="kGv" style="color:var(--ac);font-size:18px">—</div><div class="kl">USD Ganado 2026</div>
     </div>
   </div>
   <div class="kc-wide" style="margin-bottom:8px">
@@ -915,6 +923,10 @@ function renderOpps(filtro){
     const dias=diasSinContacto(o.ultimoContacto);
     return !['Ganado','Perdido','Hibernado'].includes(o.etapa)&&dias>21;
   });
+  else if(f==='atencion')filtered=filtered.filter(o=>{
+    const dias=diasSinContacto(o.ultimoContacto);
+    return !['Ganado','Perdido','Hibernado'].includes(o.etapa)&&dias>10&&dias<=21;
+  });
   else if(f)filtered=filtered.filter(o=>o.etapa===f);
   
   // Sort by score desc
@@ -1043,6 +1055,11 @@ function renderDashboard(){
     const d=diasSinContacto(o.ultimoContacto);
     return !['Ganado','Perdido','Hibernado'].includes(o.etapa)&&o.cliente&&d>21;
   }).length;
+  const at=opps.filter(o=>{
+    const d=diasSinContacto(o.ultimoContacto);
+    return !['Ganado','Perdido','Hibernado'].includes(o.etapa)&&o.cliente&&d>10&&d<=21;
+  }).length;
+  const ganVal=opps.filter(o=>o.etapa==='Ganado').reduce((s,o)=>s+(o.valor||0),0);
   const pip=opps.filter(o=>!['Ganado','Perdido','Hibernado'].includes(o.etapa)).reduce((s,o)=>s+(o.valor||0),0);
   const fore=opps.filter(o=>!['Ganado','Perdido','Hibernado'].includes(o.etapa)).reduce((s,o)=>{
     const p=o.etapa==='Negociacion'?.7:o.etapa==='Cotizado'?.35:.1;
@@ -1051,6 +1068,8 @@ function renderDashboard(){
   
   document.getElementById('kA').textContent=act;
   document.getElementById('kU').textContent=urg;
+  document.getElementById('kAt').textContent=at;
+  document.getElementById('kGv').textContent='USD '+Math.round(ganVal).toLocaleString('es-AR');
   document.getElementById('kN').textContent=neg;
   document.getElementById('kG').textContent=gan;
   document.getElementById('kP').textContent='USD '+pip.toLocaleString('es-AR');
